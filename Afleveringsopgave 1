@@ -1,0 +1,99 @@
+
+
+// Brugere
+$users = [
+    1 => ["fornavn" => "Anna", "efternavn" => "Jensen"],
+    2 => ["fornavn" => "Mads", "efternavn" => "Hansen"],
+    3 => ["fornavn" => "Sara", "efternavn" => "Larsen"],
+];
+
+// Indlæg, man skal skrive pid=101 eller pid=102 i browser
+$posts = [
+    101 => [
+        "titel" => "Min første blogpost",
+        "indhold" => "Dette er mit allerførste indlæg på siden.",
+        "forfatter_id" => 1,
+        "billeder" => [
+            "post1a.jpg",
+            "post1b.jpg"
+        ]
+    ],
+    102 => [
+        "titel" => "PHP er sjovt!",
+        "indhold" => "Her viser jeg hvordan man bruger arrays og loops.",
+        "forfatter_id" => 2,
+        "billeder" => [
+            "php1.jpg"
+        ]
+    ]
+];
+
+// Kommentarer
+$comments = [
+    ["post_id" => 101, "tekst" => "Godt skrevet!", "forfatter_id" => 2],
+    ["post_id" => 101, "tekst" => "Glæder mig til at læse mere.", "forfatter_id" => 3],
+    ["post_id" => 102, "tekst" => "Tak for eksemplet!", "forfatter_id" => 1]
+];
+
+
+//  URL
+
+$pid = isset($_GET['pid']) ? (int)$_GET['pid'] : 0;
+
+
+// Hvis indlægget ikke findes
+
+if (!isset($posts[$pid])) {
+    echo "<h2>Fejl:</h2><p>Intet indlæg fundet med id <strong>$pid</strong>.</p>";
+    exit;
+}
+
+
+// Henter indlægsdata
+
+$post = $posts[$pid];
+$forfatter = $users[$post['forfatter_id']];
+?>
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title><?php echo htmlspecialchars($post['titel']); ?></title>
+</head>
+<body>
+
+<h1><?php echo htmlspecialchars($post['titel']); ?></h1>
+
+<p><?php echo nl2br(htmlspecialchars($post['indhold'])); ?></p>
+
+<p><strong>Forfatter:</strong>
+    <?php echo htmlspecialchars($forfatter['fornavn'] . " " . $forfatter['efternavn']); ?>
+</p>
+
+<h3>Billeder:</h3>
+<?php
+
+// Loop gennem billeder
+foreach ($post['billeder'] as $billede) {
+    echo '<img src="'.htmlspecialchars($billede).'" alt="Post billede" style="max-width:200px; margin:5px;">';
+}
+?>
+
+<h3>Kommentarer:</h3>
+<ul>
+<?php
+// Loop gennem kommentarer og viser dem, hvis de hører til dette indlæg
+foreach ($comments as $c) {
+    if ($c['post_id'] == $pid) {
+        $komForfatter = $users[$c['forfatter_id']];
+        echo "<li>".htmlspecialchars($c['tekst'])." – <em>".
+             htmlspecialchars($komForfatter['fornavn'])." ".
+             htmlspecialchars($komForfatter['efternavn'])."</em></li>";
+    }
+}
+?>
+</ul>
+
+</body>
+</html>
+
